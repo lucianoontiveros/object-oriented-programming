@@ -1,46 +1,51 @@
-class Viewers {
-  constructor(name, id, status) {
+class Viewer {
+  constructor(name) {
     this.name = name;
-    this.id = id;
-    this.status = status;
+    this._id = null;
+    this.status = null;
     this.tasks = [];
     this.exams = [];
-    this.lastTime;
-
+    this.lastTime = "";
     this.personaldata = [];
+    this._mensaje = "";
   }
 
-  get viewUser() {
-    this.lastTime = new Date();
+  // Getter para mensaje
+  get mensaje() {
+    return this._mensaje || "No hay mensaje disponible";
   }
 
-  set registerUser(user) {
-    this.name = user;
+  get id() {
+    return `Para el usuario ${this.name} tiene asignado el ID: ${this._id}`;
+  }
+
+  // Setter para mensaje
+  mensaje() {
+    return (this._mensaje = value);
+  }
+
+  registerID() {
+    const timestamp = Date.now().toString(36);
+    const randomSegment = Math.floor(Math.random() * 10000).toString(36);
+    this._id = `${timestamp}-${randomSegment}`;
+  }
+
+  registerUser() {
+    const date = new Date();
+    const año = date.getFullYear();
+    const mes = (date.getMonth() + 1).toString().padStart(2, "0");
+    const día = date.getDate().toString().padStart(2, "0");
+    const horas = date.getHours().toString().padStart(2, "0");
+    const minutos = date.getMinutes().toString().padStart(2, "0");
+    const segundos = date.getSeconds().toString().padStart(2, "0");
+    const timeFormat = `${this.name} interactuó por última vez: ${día}/${mes}/${año} ${horas}:${minutos}:${segundos}.`;
+    this.lastTime = date;
+    this.mensaje = timeFormat; // Asignamos mensaje usando el setter
+  }
+
+  message() {
+    return this.mensaje;
   }
 }
 
-const users = JSON.parse(localStorage.getItem("users")) || {};
-
-const registrationUsers = (users) =>
-  localStorage.setItem("users", JSON.stringify(users));
-
-const foundUser = (view) => {
-  let useridentified = users[view];
-  if (useridentified) {
-    useridentified.viewUser;
-    registrationUsers(users);
-    console.log(
-      `encontré a  ${useridentified.name} se actualiza su registro  ${useridentified.lastTime}`
-    );
-  } else {
-    console.log(`No encuentro al usaurio ${view}`);
-    const user = new Viewers(view);
-    users[view] = user;
-    users[view].lastTime = new Date();
-    let nombreView = (users[view].registerUser = view);
-    registrationUsers(users);
-    console.log(`Registro del usaurio ${nombreView}`);
-  }
-};
-
-export { foundUser };
+export { Viewer };
