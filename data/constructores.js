@@ -7,7 +7,6 @@ class Viewer {
     this.exams = [];
     this.lastTime = "";
     this.personaldata = [];
-    this._mensaje = "";
   }
 
   // Getter para mensaje
@@ -16,7 +15,7 @@ class Viewer {
   }
 
   get id() {
-    return `Para el usuario ${this.name} tiene asignado el ID: ${this._id}`;
+    return `${this.name} tiene el ID: ${this._id}`;
   }
 
   // Setter para mensaje
@@ -30,21 +29,14 @@ class Viewer {
     this._id = `${timestamp}-${randomSegment}`;
   }
 
+  // Registrar la última interacción del usuario
   registerUser() {
     const date = new Date();
-    const año = date.getFullYear();
-    const mes = (date.getMonth() + 1).toString().padStart(2, "0");
-    const día = date.getDate().toString().padStart(2, "0");
-    const horas = date.getHours().toString().padStart(2, "0");
-    const minutos = date.getMinutes().toString().padStart(2, "0");
-    const segundos = date.getSeconds().toString().padStart(2, "0");
-    const timeFormat = `${this.name} interactuó por última vez: ${día}/${mes}/${año} ${horas}:${minutos}:${segundos}.`;
+    const formattedDate = date.toLocaleDateString("es-ES");
+    const formattedTime = date.toLocaleTimeString("es-ES");
+    const lastConection = `${this.name} interactuó por última vez: ${formattedDate} ${formattedTime}.`;
     this.lastTime = date;
-    this.mensaje = timeFormat; // Asignamos mensaje usando el setter
-  }
-
-  message() {
-    return this.mensaje;
+    this.mensaje = lastConection; // Asignamos mensaje usando el setter
   }
 }
 
