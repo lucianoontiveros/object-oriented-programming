@@ -2,9 +2,10 @@ import "./style.css";
 import javascriptLogo from "./javascript.svg";
 import viteLogo from "/vite.svg";
 import {
-  foundUser,
+  foundOrCreateUser,
   deleteUser,
-  verifyID,
+  verifyIdUser,
+  changeNameUser,
 } from "./data/controllerUsers/controllerUsers";
 
 document.querySelector("#app").innerHTML = `
@@ -18,7 +19,8 @@ document.querySelector("#app").innerHTML = `
   </div>
 `;
 
-foundUser("Macarena");
-foundUser("Marcos");
-verifyID("Marcos");
-deleteUser("Pedro", "m37s7s2t-2ij");
+foundOrCreateUser("Miguel");
+foundOrCreateUser("Luciano");
+foundOrCreateUser("Mariela");
+foundOrCreateUser("Ezequiel");
+changeNameUser("Miguel", "Alejandro");

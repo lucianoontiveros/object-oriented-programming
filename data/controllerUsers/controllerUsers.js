@@ -5,49 +5,88 @@ import {
 } from "../LocalStorage/controllerLocalStorage";
 
 // Devolver un objeto con propiedades al extraer de localStorage.
-const userIdentified = (view) => {
-  const userAdapter = new Viewer(users[view].name);
-  Object.assign(userAdapter, users[view]);
-  userAdapter.registerUser();
-  console.log(userAdapter.message(), userAdapter.id); // Llamamos al getter para mensaje
-  users[view] = userAdapter;
-  registrationUsers(users);
+const identifiedUser = (foundUserView) => {
+  try {
+    const userAdapter = new Viewer(users[foundUserView].name);
+    Object.assign(userAdapter, users[foundUserView]);
+    userAdapter.registerUser();
+    console.log(userAdapter.mensaje, userAdapter.id); // Llamamos al getter para mensaje
+    users[foundUserView] = userAdapter;
+    registrationUsers(users);
+  } catch (error) {
+    console.error(
+      "Inconvenientes para asignarles propiedades al usuario desde el localStorage"
+    );
+  }
 };
 
 // Identificación de usuario
-const foundUser = (view) => {
-  if (users[view]) {
-    userIdentified(view);
-  } else {
-    console.log(`el usuario ${view}o no existe`);
-    const user = new Viewer(view);
-    user.registerUser();
-    user.registerID();
-    users[view] = user;
-    console.log(users[view].mensaje);
+const foundOrCreateUser = (foundUserView) => {
+  try {
+    if (users[foundUserView]) {
+      identifiedUser(foundUserView);
+    } else {
+      console.log(`El usuario ${foundUserView}o no existe`);
+      const user = new Viewer(foundUserView);
+      user.mensaje = `El usuario ${user.name} fue generado`;
+      console.log(user.mensaje);
+      user.registerUser();
+      user.registerID();
+      users[foundUserView] = user;
+      console.log(users[foundUserView].mensaje);
+      registrationUsers(users);
+    }
+  } catch (error) {
+    console.error("Inconvenientes para encontrar el usuario y/o registrarlo");
   }
-  registrationUsers(users);
 };
 
-// Verificar ID
-const verifyID = (view) => {
-  foundUser(view);
-  console.log(users[view].id);
-};
-
-// Borrar usaurio con id propio
-const deleteUser = (view, id) => {
-  foundUser(view);
-  if (users[view]._id == id) {
-    delete users[view];
-    console.log(`Se eliminó el usuario ${view}`);
-  } else {
-    console.log(`el usuario ${view} no se corresponde con el ID ${id}`);
+// Verificar ID de usuario
+const verifyIdUser = (userVerifyViewID) => {
+  try {
+    foundUser(userVerifyViewID);
+    console.log(users[userVerifyViewID].id);
+  } catch (error) {
+    console.error("No se puede verificar cual es el ID del usuario");
   }
-  registrationUsers(users);
 };
 
-// Crear funcion para modificar el nombre del array.
+// Borrar usaurio con ID propio
+const deleteUser = (userViewDelete, userViewID) => {
+  try {
+    foundUser(userViewDelete);
+    if (users[userViewDelete]._id == userViewID) {
+      delete users[userViewDelete];
+      registrationUsers(users);
+      console.log(`Se eliminó el usuario ${userViewDelete}`);
+    } else {
+      console.log(
+        `El usuario ${userViewDelete} no se corresponde con el ID ${userViewID}`
+      );
+    }
+  } catch (error) {
+    console.error(
+      "Iconvenientes para eliminar el usuario. Favor de verificar userViewID"
+    );
+  }
+};
+
+// Cambiar nombre sosteniendo los atributos del usario original.
+const changeNameUser = (oldUserView, newUserView) => {
+  try {
+    identifiedUser(oldUserView);
+    const user = new Viewer(newUserView);
+    user._id = users[oldUserView]._id;
+    Object.assign(users[oldUserView], user);
+    users[newUserView] = user;
+    delete users[oldUserView];
+    registrationUsers(users);
+  } catch (error) {
+    console.error(
+      "No se puede asignar el nuevo nombre y mantener los atributos"
+    );
+  }
+};
 
 console.log(users);
-export { foundUser, deleteUser, verifyID };
+export { foundOrCreateUser, deleteUser, verifyIdUser, changeNameUser };
