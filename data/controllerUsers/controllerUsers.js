@@ -26,7 +26,7 @@ const foundOrCreateUser = (foundUserView) => {
     if (users[foundUserView]) {
       identifiedUser(foundUserView);
     } else {
-      console.log(`El usuario ${foundUserView}o no existe`);
+      console.log(`El usuario ${foundUserView} no existe`);
       const user = new Viewer(foundUserView);
       user.mensaje = `El usuario ${user.name} fue generado`;
       console.log(user.mensaje);

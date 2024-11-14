@@ -12,25 +12,60 @@ class Task {
   }
 }
 
+// Gestor de mensajes
+const sendMessage = (message) => {
+  console.log(message);
+};
+
+const MESSAGES = {
+  addTask: (user, task, ID) =>
+    `${user}, Registramos tu tarea: ${task} | ID: ${ID}.`,
+  noTasks: (user) =>
+    `${user}, no tienes tareas registradas. Puedes informarte como utilizar el gestor de tareas a través de !taskInfo.`,
+  tasksList: (user, description, ID) => `|${user}| ${ID} | ${description} |`,
+  deleteTask: (user, description, ID) =>
+    `${user}, la tarea | ${ID} | ${description} | fue ELIMINADA.`,
+  readyTask: (user, description, ID) =>
+    `${user}, la tarea | ${ID} | ${description} | fue marcada como REALIZADA.`,
+  readyAllTaks: (user) =>
+    `${user} todas tus tareas fueron marcadas como REALIZADAS.`,
+  clearAllTaks: (user) => `{user} todas tus tareas fueron ELIMINADAS.`,
+  noFoundTask: (user, ID) => `|${user}|, la tarea con |ID: ${ID}| no existe.`,
+};
+
+// Funciones para dar soporte a funciones principales
+
 const examID = () => Math.random().toString(36).substring(2, 5);
 
 const reviewListTask = (user) => {
-  users[user].tasks.map((task) => {
-    if (reviewListTask.leght == 0) {
-      return console.log(
-        "No tienes tareas agregadas. Si quieres usar la funcionalidad debes ingresar addTaskUser()"
-      );
-    } else {
-      return task.description, task._id;
-    }
-  });
+  let task = users[user].tasks;
+  if (task.length === 0) {
+    sendMessage(MESSAGES.noTasks(user));
+  } else {
+    task.forEach((usertTask) =>
+      sendMessage(
+        MESSAGES.tasksList(user, usertTask.description, usertTask._id)
+      )
+    );
+  }
 };
+
+const filterTaskListUser = (user, ID) => {
+  return users[user].tasks.filter((userTask) => userTask._id != ID);
+};
+
+const foundTask = (user, ID) => {
+  return users[user].tasks.find((userTask) => userTask._id === ID);
+};
+
+// Funciones para gestionar tareas.
 
 const addTaskUser = (user, addTask) => {
   foundOrCreateUser(user);
   const newTaskUser = new Task(addTask, examID());
+  console.log(newTaskUser);
   users[user].tasks.push(newTaskUser);
-  console.log(`${user} agregó "${addTask}" a su listado de tareas`);
+  sendMessage(MESSAGES.addTask(user, newTaskUser.description, newTaskUser._id));
   registrationUsers(users);
 };
 
@@ -39,11 +74,25 @@ const reviewListTaskUser = (user) => {
   reviewListTask(user);
 };
 
-const readyTaskUser = (user) => {};
+const readyTaskUser = (user, ID) => {
+  const taskUser = foundTask(user, ID);
+  if (!taskUser) {
+    sendMessage(MESSAGES.noFoundTask(user, ID));
+  } else {
+    sendMessage(MESSAGES.readyTask(user, taskUser.description, taskUser._id));
+  }
+  users[user].tasks = filterTaskListUser(user, ID);
+  registrationUsers(users);
+};
 
 const deleteTaskUser = (user, ID) => {
-  foundOrCreateUser(user);
-
+  const taskUser = foundTask(user, ID);
+  if (!taskUser) {
+    sendMessage(MESSAGES.noFoundTask(user, ID));
+  } else {
+    sendMessage(MESSAGES.readyTask(user, taskUser.description, taskUser._id));
+  }
+  users[user].tasks = filterTaskListUser(user, ID);
   registrationUsers(users);
 };
 
