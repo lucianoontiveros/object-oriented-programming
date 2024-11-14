@@ -35,7 +35,18 @@ document.querySelector("#app").innerHTML = `
   </div>
 `;
 
-// Debería mostrar solo los exámenes válidos y eliminar automáticamente el de fecha pasada (01-01)
-addTaskUser("Mario", "Soy Mario");
-// reviewListTaskUser("Mario");
-readyListAllListUser("Mario");
+// crear tareas
+addTaskUser("Liana", "Tarea de Liana 1");
+addTaskUser("Liana", "Tarea de Liana 2");
+addTaskUser("Marcos", "Tarea de Marcos 1");
+addTaskUser("Marcos", "Tarea de Marcos 2");
+addTaskUser("Luis", "Tarea de Luis 1");
+addTaskUser("Pipo", "Tarea de Pipo 2");
+// mostrar tareas
+readyListAllListUser("Marcos");
+readyListAllListUser("Liana");
+// eliminar tarea por id
+reviewListTaskUser("Marcos");
+reviewListTaskUser("Liliana");
+
+// Marcar tarea por id
