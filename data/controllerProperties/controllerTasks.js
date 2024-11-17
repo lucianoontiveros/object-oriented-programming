@@ -29,8 +29,10 @@ const MESSAGES = {
     `${user}, la tarea | ${ID} | ${description} | fue marcada como REALIZADA.`,
   readyAllTaks: (user) =>
     `${user} todas tus tareas fueron marcadas como REALIZADAS.`,
-  clearAllTaks: (user) => `{user} todas tus tareas fueron ELIMINADAS.`,
+  clearAllTaks: (user) => `${user} todas tus tareas fueron ELIMINADAS.`,
   noFoundTask: (user, ID) => `|${user}|, la tarea con |ID: ${ID}| no existe.`,
+  modifyTask: (user, ID, task) =>
+    `|${user}|, la tarea con |ID: ${ID}| fue modificada por "${task}"`,
 };
 
 // Funciones para dar soporte a funciones principales
@@ -58,12 +60,15 @@ const foundTask = (user, ID) => {
   return users[user].tasks.find((userTask) => userTask._id === ID);
 };
 
+const foundIndexTask = (user, ID) => {
+  return users[user].tasks.findIndex((userTask) => userTask._id === ID);
+};
+
 // Funciones para gestionar tareas.
 
 const addTaskUser = (user, addTask) => {
   foundOrCreateUser(user);
   const newTaskUser = new Task(addTask, examID());
-  console.log(newTaskUser);
   users[user].tasks.push(newTaskUser);
   sendMessage(MESSAGES.addTask(user, newTaskUser.description, newTaskUser._id));
   registrationUsers(users);
@@ -80,9 +85,9 @@ const readyTaskUser = (user, ID) => {
     sendMessage(MESSAGES.noFoundTask(user, ID));
   } else {
     sendMessage(MESSAGES.readyTask(user, taskUser.description, taskUser._id));
+    users[user].tasks = filterTaskListUser(user, ID);
+    registrationUsers(users);
   }
-  users[user].tasks = filterTaskListUser(user, ID);
-  registrationUsers(users);
 };
 
 const deleteTaskUser = (user, ID) => {
@@ -90,25 +95,35 @@ const deleteTaskUser = (user, ID) => {
   if (!taskUser) {
     sendMessage(MESSAGES.noFoundTask(user, ID));
   } else {
-    sendMessage(MESSAGES.readyTask(user, taskUser.description, taskUser._id));
+    sendMessage(MESSAGES.deleteTask(user, taskUser.description, taskUser._id));
+    users[user].tasks = filterTaskListUser(user, ID);
+    registrationUsers(users);
   }
-  users[user].tasks = filterTaskListUser(user, ID);
-  registrationUsers(users);
 };
 
 const modifyTaskUser = (user, ID, modifyTask) => {
-  foundOrCreateUser();
+  const taskUser = foundIndexTask(user, ID);
+  console.log();
+  if (!taskUser) {
+    sendMessage(MESSAGES.noFoundTask(user, ID));
+  } else {
+    sendMessage(MESSAGES.modifyTask(user, ID, modifyTask));
+    users[user].tasks[taskUser].description = modifyTask;
+  }
+  foundOrCreateUser(user);
   registrationUsers(users);
 };
 
 const deleteAllListTaskUser = (user) => {
   foundOrCreateUser(user);
+  sendMessage(MESSAGES.clearAllTaks(user));
+  users[user].tasks = [];
   registrationUsers(users);
 };
 
 const readyListAllListUser = (user) => {
   foundOrCreateUser(user);
-  reviewListTask(user);
+  sendMessage(MESSAGES.readyAllTaks(user));
   users[user].tasks = [];
   registrationUsers(users);
 };
