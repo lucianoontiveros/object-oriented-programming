@@ -17,6 +17,20 @@ class Exams {
   }
 }
 
+const sendMensaje = (message) => {
+  console.log(message);
+};
+
+const MESSAGE = {
+  errorValidDate: (user) =>
+    `${user} Fecha no válida. Use el formato dd-mm y asegúrese de que sea una fecha existente.`,
+  errorID: (user) => `El id especificado es incorrecto, ${user}`,
+  noExams: (user) =>
+    `No tiene examenes ${user}. Puede crear un listado utilizando addExam() con el formato dd-mm, type-exam, Title-Exam: ejemplo  12-03 FIN neumonia y enfermedades pulmonares`,
+  deleteExams: (user) => `${user}, tus examenes fueron eliminados de la lista`,
+  deleteExam: (user, ID) => `${user} tu examen fue eliminado con ID: ${ID}`,
+};
+
 // comprobaciones de ingreso de fecha
 const isValidDate = (dateString) => {
   const [day, month] = dateString.split("-").map(Number);
@@ -44,9 +58,19 @@ const isValidDate = (dateString) => {
 const isPastDate = (dateString) => {
   const [day, month] = dateString.split("-").map(Number);
   const today = new Date();
-  const examDate = new Date(today.getFullYear(), month - 1, day);
+  // Ignorar horas, comparando solo fechas
+  const examDate = new Date(today.getFullYear(), month - 1, day, 0, 0, 0, 0);
+  const todayWithoutTime = new Date(
+    today.getFullYear(),
+    today.getMonth(),
+    today.getDate(),
+    0,
+    0,
+    0,
+    0
+  );
 
-  return examDate < today;
+  return examDate < todayWithoutTime;
 };
 
 const examID = () => Math.random().toString(36).substring(2, 5);
@@ -57,9 +81,7 @@ const addExam = (addExamUser, dateExamUser) => {
 
   // Validar formato de fecha
   if (!isValidDate(dateExam)) {
-    console.log(
-      "Fecha no válida. Use el formato dd-mm y asegúrese de que sea una fecha existente."
-    );
+    sendMensaje(MESSAGE.errorValidDate(addExamUser));
     return;
   }
 
@@ -68,10 +90,9 @@ const addExam = (addExamUser, dateExamUser) => {
     dateExamUser.slice(10).charAt(0).toUpperCase() + dateExamUser.slice(11);
 
   const newDataExamUser = new Exams(dateExam, typeExam, titleExam, examID());
-  console.log(newDataExamUser.id);
   users[addExamUser].exams.push(newDataExamUser);
 
-  // Eliminar exámenes pasados luego de agregar el nuevo
+  // Ordenar exámenes por fecha (día y mes)
   users[addExamUser].exams.sort((a, b) => {
     const [dayA, monthA] = a.dateExam.split("-").map(Number);
     const [dayB, monthB] = b.dateExam.split("-").map(Number);
@@ -82,6 +103,7 @@ const addExam = (addExamUser, dateExamUser) => {
     return monthA - monthB; // Ordenar por mes
   });
 
+  // Filtrar solo exámenes que no sean pasados
   users[addExamUser].exams = users[addExamUser].exams.filter(
     (exam) => !isPastDate(exam.dateExam)
   );
@@ -89,7 +111,7 @@ const addExam = (addExamUser, dateExamUser) => {
   registrationUsers(users);
 };
 
-// Eliminar examene por ID
+// Eliminar examen por ID
 const deleteExam = (deleteExamUser, examID) => {
   foundOrCreateUser(deleteExamUser);
   const deleteExamForID = users[deleteExamUser].exams.findIndex(
@@ -97,9 +119,12 @@ const deleteExam = (deleteExamUser, examID) => {
   );
   if (deleteExamForID != -1) {
     users[deleteExamUser].exams.splice(deleteExamForID, 1);
-  } else console.log("El id especificado es incorrecto");
-  registrationUsers(users);
-  console.log(users[deleteExamUser].exams);
+    sendMensaje(MESSAGE.deleteExam(deleteExamUser, examID));
+  } else {
+    sendMensaje(MESSAGE.noExams(deleteExamUser));
+    registrationUsers(users);
+    console.log(users[deleteExamUser].exams);
+  }
 };
 
 const reviewExam = (reviewExamUSer) => {
@@ -108,23 +133,20 @@ const reviewExam = (reviewExamUSer) => {
   });
   foundOrCreateUser(reviewExamUSer);
   if (reviewExamUser.length === 0) {
-    console.log("No tiene examenes");
+    sendMensaje(MESSAGE.noExams(reviewExamUSer));
   }
 };
 
 const deleteAllExams = (deletaAllExamUSer) => {
-  console.log("Ingrese a la funci[on");
   foundOrCreateUser(deletaAllExamUSer);
   const deleteListExamsUser = users[deletaAllExamUSer].exams.map((userExam) => {
     console.log(userExam.typeExam, userExam.dateExam, userExam.titleExam);
   });
   if (deleteListExamsUser.length === 0) {
-    console.log(
-      "No tenia registrado examens. Puede crear un listado utilizando addExam() con el formato dd-mm, type-exam, Title-Exam: ejemplo  12-03 FIN neumonia y enfermedades pulmonares "
-    );
+    sendMensaje(MESSAGE.noExams(deletaAllExamUSer));
   } else {
     users[deletaAllExamUSer].exams = [];
-    console.log("Su examenes fueron eliminados de la lista");
+    sendMensaje(MESSAGE.deleteExams(deletaAllExamUSer));
   }
   registrationUsers(users);
 };

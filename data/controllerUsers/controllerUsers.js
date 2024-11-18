@@ -4,6 +4,13 @@ import {
   registrationUsers,
 } from "../LocalStorage/controllerLocalStorage";
 
+const sendMessage = (message, error) => {
+  if (error) {
+    return console.error(message);
+  }
+  console.log(message);
+};
+
 const MESSAGES = {
   userAssignedPropsError: () =>
     "Inconvenientes para asignarles propiedades al usuario desde el localStorage.",
@@ -47,7 +54,7 @@ const identifiedUser = (foundUserView) => {
     users[foundUserView] = userAdapter;
     registrationUsers(users);
   } catch (error) {
-    console.error(MESSAGES.userAssignedPropsError());
+    sendMessage(MESSAGES.userIDVerifyError(), error);
   }
 };
 
@@ -65,7 +72,7 @@ const foundOrCreateUser = (foundUserView) => {
       registrationUsers(users);
     }
   } catch (error) {
-    console.error(MESSAGES.userFoundOrCreateError());
+    sendMessage(MESSAGES.userIDVerifyError(), error);
   }
 };
 
@@ -73,9 +80,9 @@ const foundOrCreateUser = (foundUserView) => {
 const verifyIdUser = (userVerifyViewID) => {
   try {
     const user = foundUser(userVerifyViewID);
-    console.log(MESSAGES.userID(userVerifyViewID, user._id));
+    sendMensaje(MESSAGES.userID(userVerifyViewID, user._id));
   } catch (error) {
-    console.error(MESSAGES.userIDVerifyError());
+    sendMessage(MESSAGES.userIDVerifyError(), error);
   }
 };
 
@@ -86,12 +93,12 @@ const deleteUser = (userViewDelete, userViewID) => {
     if (user._id === userViewID) {
       delete users[userViewDelete];
       registrationUsers(users);
-      console.log(MESSAGES.userDeleteSuccess(userViewDelete));
+      sendMensaje(MESSAGES.userDeleteSuccess(userViewDelete));
     } else {
-      console.log(MESSAGES.userDeleteMismatch(userViewDelete, userViewID));
+      sendMensaje(MESSAGES.userDeleteMismatch(userViewDelete, userViewID));
     }
   } catch (error) {
-    console.error(MESSAGES.userDeleteError());
+    sendMessage(MESSAGES.userDeleteError()), error;
   }
 };
 
@@ -105,9 +112,9 @@ const changeNameUser = (oldUserView, newUserView) => {
     users[newUserView] = newUser;
     delete users[oldUserView];
     registrationUsers(users);
-    console.log(MESSAGES.userNameChange(oldUserView, newUserView));
+    sendMensaje(MESSAGES.userNameChange(oldUserView, newUserView));
   } catch (error) {
-    console.error(MESSAGES.userNameChangeError());
+    sendMessage(MESSAGES.userNameChangeError(), error);
   }
 };
 
@@ -123,7 +130,7 @@ const deleteInactiveUsersTwoMonths = () => {
       const lastActiveTime = new Date(user.lastTime).getTime();
       if (currentTime - lastActiveTime > twoMonths) {
         delete users[username];
-        console.log(MESSAGES.userInactiveDeleted(username));
+        sendMensaje(MESSAGES.userInactiveDeleted(username));
         usersDeleted = true;
       }
     }
@@ -132,7 +139,7 @@ const deleteInactiveUsersTwoMonths = () => {
   registrationUsers(users);
 
   if (!usersDeleted) {
-    console.log(MESSAGES.noInactiveUsers());
+    sendMessage(MESSAGES.noInactiveUsers());
   }
 };
 
