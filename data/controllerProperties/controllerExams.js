@@ -3,6 +3,7 @@ import {
   registrationUsers,
 } from "../LocalStorage/controllerLocalStorage";
 import { foundOrCreateUser } from "../controllerUsers/controllerUsers";
+import { addDataPoints } from "../controllerProperties/controllerPersonalData";
 
 class Exams {
   constructor(dateExam, typeExam, titleExam, examID) {

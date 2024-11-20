@@ -3,6 +3,7 @@ import {
   registrationUsers,
 } from "../LocalStorage/controllerLocalStorage";
 import { foundOrCreateUser } from "../controllerUsers/controllerUsers";
+import { addDataPoints } from "../controllerProperties/controllerPersonalData";
 
 class Task {
   constructor(task, ID) {
@@ -49,6 +50,7 @@ const reviewListTask = (user) => {
         MESSAGES.tasksList(user, usertTask.description, usertTask._id)
       )
     );
+    addDataPoints(user);
   }
 };
 
@@ -71,6 +73,7 @@ const addTaskUser = (user, addTask) => {
   const newTaskUser = new Task(addTask, examID());
   users[user].tasks.push(newTaskUser);
   sendMessage(MESSAGES.addTask(user, newTaskUser.description, newTaskUser._id));
+  addDataPoints(user);
   registrationUsers(users);
 };
 
@@ -86,6 +89,7 @@ const readyTaskUser = (user, ID) => {
   } else {
     sendMessage(MESSAGES.readyTask(user, taskUser.description, taskUser._id));
     users[user].tasks = filterTaskListUser(user, ID);
+    addDataPoints(user);
     registrationUsers(users);
   }
 };
@@ -97,6 +101,7 @@ const deleteTaskUser = (user, ID) => {
   } else {
     sendMessage(MESSAGES.deleteTask(user, taskUser.description, taskUser._id));
     users[user].tasks = filterTaskListUser(user, ID);
+    addDataPoints(user);
     registrationUsers(users);
   }
 };
@@ -125,6 +130,7 @@ const readyListAllListUser = (user) => {
   foundOrCreateUser(user);
   sendMessage(MESSAGES.readyAllTaks(user));
   users[user].tasks = [];
+  addDataPoints(user);
   registrationUsers(users);
 };
 

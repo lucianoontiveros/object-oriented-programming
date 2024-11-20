@@ -32,7 +32,7 @@ import {
   addInstagram,
   addOppositionfor,
   addStudyFor,
-  croquetasTotal,
+  giveCroquetas,
 } from "./data/controllerProperties/controllerPersonalData";
 
 document.querySelector("#app").innerHTML = `
