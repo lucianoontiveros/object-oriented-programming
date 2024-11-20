@@ -28,8 +28,8 @@ const MESSAGE = {
     points == 1
       ? `${user} agregó ${points} punto`
       : `${user} ahora tiene ${points} puntos`,
-  addnationalityUser: (user, nacionality) =>
-    `${user}, confirma su nacionalidad como ${nacionality}`,
+  addNationalityUser: (user, nationality) =>
+    `${user}, confirma su nacionalidad como ${nationality}`,
   addBirthUser: (user, birth, sign) =>
     `${user} indico que su fecha de nacimiento es el ${birth} y su signo es ${sign}`,
   addInstagramUser: (user, instagram) =>
@@ -40,90 +40,118 @@ const MESSAGE = {
     `${user} indicó que estudia para ${studyForUser}`,
   addCroquetasUser: (user, croquetasUser) =>
     croquetasUser == 1
-      ? `${user} agregó ${croquetasUser} croqueta`
-      : `${user} ahora tiene ${croquetasUser} croquetas más`,
+      ? `${user} le entregó ${croquetasUser} croqueta a Brunito, en todo este tiempo`
+      : `${user} le entrego ${croquetasUser} croquetas en todo este tiempo`,
+  noPoints: (user) =>
+    `${user}, no tiene puntos. Puede generar los mismos registrando y gestionando tus tareas y examenes`,
 };
 
 const reviewPersonalData = (user) => {
-  if (users[user].personaldata == 0) {
+  if (!users[user]?.personaldata?.length) {
     const personalDataUser = new PersonalData();
-    users[user].personaldata.push(personalDataUser);
+    users[user] = { ...users[user], personaldata: [personalDataUser] }; // Evitar mutaciones directas
     sendMensaje(MESSAGE.addConfirmDataUser(user));
     registrationUsers(users);
   }
 };
 
-const addDataSignZodiacal = (user, dateBirth) => {
-  console.log(dateBirth);
-  let sign = "Teta";
-  sendMensaje(MESSAGE.addBirthUser(user, dateBirth, sign));
-  registrationUsers(users);
-};
-
-const addDataPoints = (user) => {
+const updatePersonalData = (user, key, value) => {
   foundOrCreateUser(user);
   reviewPersonalData(user);
-  users[user].personaldata.forEach((point) => point.points++);
-  sendMensaje(MESSAGE.addPointsUser(user, users[user].personaldata[0].points));
-  registrationUsers(users);
-};
-
-const addDataNationality = (user, nationalityUser) => {
-  foundOrCreateUser(user);
-  reviewPersonalData(user);
-  users[user].personaldata.forEach(
-    (AddNationality) => (AddNationality.nationality = nationalityUser)
-  );
-  sendMensaje(MESSAGE.addnationalityUser(user, nationalityUser));
+  users[user].personaldata.forEach((data) => (data[key] = value));
   registrationUsers(users);
 };
 
 const addBirth = (user, dateBirth) => {
   foundOrCreateUser(user);
   reviewPersonalData(user);
-  users[user].personaldata.forEach((AddDate) => (AddDate.birth = dateBirth));
+  updatePersonalData(user, "birth", dateBirth);
   registrationUsers(users);
   addDataSignZodiacal(user, dateBirth);
 };
 
+const addDataSignZodiacal = (user, dateBirth) => {
+  const [dia, mes] = dateBirth.split("-").map(Number);
+  let sign;
+  switch (mes) {
+    case 3:
+      sign = dia >= 21 ? "Aries ♈︎" : "Piscis ♓︎";
+      break;
+    case 4:
+      sign = dia <= 19 ? "Aries ♈︎" : "Tauro ♉︎";
+      break;
+    case 5:
+      sign = dia <= 20 ? "Tauro ♉︎" : "Géminis ♊︎";
+      break;
+    case 6:
+      sign = dia <= 20 ? "Géminis ♊︎" : "Cáncer ♋︎";
+      break;
+    case 7:
+      sign = dia <= 22 ? "Cáncer ♋︎" : "Leo ♌︎";
+      break;
+    case 8:
+      sign = dia <= 22 ? "Leo ♌︎" : "Virgo ♍︎";
+      break;
+    case 9:
+      sign = dia <= 22 ? "Virgo ♍︎" : "Libra ♎︎";
+      break;
+    case 10:
+      sign = dia <= 22 ? "Libra ♎︎" : "Escorpio ♏︎";
+      break;
+    case 11:
+      sign = dia <= 21 ? "Escorpio ♏︎" : "Sagitario ♐︎";
+      break;
+    case 12:
+      sign = dia <= 21 ? "Sagitario ♐︎" : "Capricornio ♑︎";
+      break;
+    case 1:
+      sign = dia <= 18 ? "Capricornio ♑︎" : "Acuario ♒︎";
+      break;
+    case 2:
+      sign = dia <= 19 ? "Acuario ♒︎" : "Piscis ♓︎";
+      break;
+    default:
+      sign = "Indefinido, no pudo establecerse";
+  }
+  users[user].personaldata[0].sign = sign;
+  sendMensaje(MESSAGE.addBirthUser(user, dateBirth, sign));
+};
+
+const addDataPoints = (user) => {
+  updatePersonalData(user, "points", users[user].personaldata[0].points + 1);
+  sendMensaje(MESSAGE.addPointsUser(user, users[user].personaldata[0].points));
+};
+
+const addDataNationality = (user, nationalityUser) => {
+  updatePersonalData(user, "nationality", nationalityUser);
+  sendMensaje(MESSAGE.addNationalityUser(user, nationalityUser));
+};
+
 const addInstagram = (user, instaUser) => {
-  foundOrCreateUser(user);
-  reviewPersonalData(user);
-  users[user].personaldata.forEach(
-    (AddInstagram) => (AddInstagram.instagram = instaUser)
-  );
+  updatePersonalData(user, "instagram", instaUser);
   sendMensaje(MESSAGE.addInstagramUser(user, instaUser));
-  registrationUsers(users);
 };
 
 const addOppositionfor = (user, oppositionUser) => {
-  foundOrCreateUser(user);
-  reviewPersonalData(user);
-  users[user].personaldata.forEach(
-    (AddOpposition) => (AddOpposition.oppositionfor = oppositionUser)
-  );
+  updatePersonalData(user, "opposition".oppositionUser);
   sendMensaje(MESSAGE.addOppositionUser(user, oppositionUser));
-  registrationUsers(users);
 };
 
 const addStudyFor = (user, studyforUser) => {
-  foundOrCreateUser(user);
-  reviewPersonalData(user);
-  users[user].personaldata.forEach(
-    (AddStudyFor) => (AddStudyFor.studyfor = studyforUser)
-  );
+  updatePersonalData(user, "studyfor", studyforUser);
   sendMensaje(MESSAGE.addStudyForUser(user, studyforUser));
-  registrationUsers(users);
 };
 
-const croquetasTotal = (user, croquetas) => {
-  foundOrCreateUser(user);
-  reviewPersonalData(user);
-  users[user].personaldata.forEach(
-    (addCroquetas) => (addCroquetas.points += croquetas)
-  );
+const addCroquetasTotal = (user, croquetas) => {
+  updatePersonalData(user, "croquetastotal", croquetas);
   sendMensaje(MESSAGE.addCroquetasUser(user, croquetas));
-  registrationUsers(users);
+};
+
+const giveCroquetas = (user) => {
+  if (users[user].personaldata[0].points !== 0) {
+    addCroquetasTotal(user, users[user].personaldata[0].croquetastotal + 1);
+    updatePersonalData(user, "points", users[user].personaldata[0].points - 1);
+  } else sendMensaje(MESSAGE.noPoints(user));
 };
 
 export {
@@ -133,7 +161,8 @@ export {
   addInstagram,
   addOppositionfor,
   addStudyFor,
-  croquetasTotal,
+  addCroquetasTotal,
+  giveCroquetas,
 };
 
 /* 
@@ -171,7 +200,7 @@ const MESSAGE = {
   addNationalityUser: (user, nationality) =>
     `${user} confirma su nacionalidad como ${nationality}`,
   addBirthUser: (user, birth, sign) =>
-    `${user} indicó que su fecha de nacimiento es el ${birth} y su signo es ${sign}`,
+    `${user} indicó que su fecha de nacimiento es el ${birth} y su sign es ${sign}`,
   addInstagramUser: (user, instagram) =>
     `${user} confirma que su usuario de Instagram es: ${instagram}`,
   addOppositionUser: (user, opposition) =>
@@ -192,9 +221,9 @@ const reviewPersonalData = (user) => {
   }
 };
 
-// Agregar signo zodiacal basado en la fecha de nacimiento (dummy actualmente)
+// Agregar sign zodiacal basado en la fecha de nacimiento (dummy actualmente)
 const addDataSignZodiacal = (user, dateBirth) => {
-  const sign = "Teta"; // Placeholder: Implementar lógica real para signo zodiacal
+  const sign = ""; // Placeholder: Implementar lógica real para signo zodiacal
   sendMensaje(MESSAGE.addBirthUser(user, dateBirth, sign));
   registrationUsers(users);
 };
@@ -257,6 +286,6 @@ export {
   addInstagram,
   addOppositionfor,
   addStudyFor,
-  croquetasTotal,
+  addCroquetasTotal,
 };
 */
